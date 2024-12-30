@@ -1,9 +1,11 @@
 #include "dataType.h"
 
-// Nguyen mau ham
-void printHello();            // In ra menu chon vai tro
-void managerMenu();           // In ra menu quan ly nguoi dung
-void printUsers();            // Hien thi danh sach nguoi dung
-void addUser();               // Them nguoi dung moi
-void adminMenu();             // Menu quan li cua Admin
-
+// Các khai báo hàm
+void printHello();
+void managerMenu();
+void printUsers();
+void addUser();
+void searchUserByName(char *name);
+void adminMenu();
+int is_valid_string(char *str);
+int is_unique(char *id, char *phone, char *email, char *username);

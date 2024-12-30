@@ -3,9 +3,12 @@
 #include <string.h>
 #include "functions.h"
 
+// Bien toan cuc trong file nay
+struct User* users = NULL;
 int userCount = 0;
+struct User newUser;
 
-// In ra Menu dau tien
+// Ham in ra menu chao
 void printHello() { 
     printf("\n   *** Bank Management System Using C ***\n");
     printf("               CHOOSE YOUR ROLE \n");
@@ -16,7 +19,7 @@ void printHello() {
     printf("      ==============================\n");
 }
 
-// In ra menu quan li nguoi dung cho Admin
+// Ham in ra menu quan ly nguoi dung cho Admin
 void managerMenu() {
     printf("\n   ===== User Management System =====\n");
     printf("           User Management Menu:\n");
@@ -28,45 +31,116 @@ void managerMenu() {
     printf("       [0]. Exit\n");
 }
 
-// Hien thi danh sach nguoi dung
+// Ham kiem tra do dai hop le cua chuoi
+int is_valid_string(char *str) {
+    return (str != NULL && strlen(str) > 0);
+}
+
+// Ham kiem tra tinh duy nhat cua thong tin
+int is_unique(char *id, char *phone, char *email, char *username) {
+    for (int i = 0; i < userCount; i++) {
+        if (strcmp(users[i].username, username) == 0 || strcmp(users[i].phone, phone) == 0 ||
+            strcmp(users[i].email, email) == 0 || strcmp(users[i].name, id) == 0) {
+            return 0;  // Du lieu bi trung (false)
+        }
+    }
+    return 1;  // Du lieu duy nhat (true)
+}
+
+// Ham hien thi danh sach nguoi dung
 void printUsers() {
     if (userCount == 0) {
         printf("No users available.\n");
         return;
     }
     printf("\nUser List:\n");
-    printf("Name\t|\tPhone Number\t|\tEmail\t|\tStatus\n");
+    printf("Name\t|\tPhone Number\t|\tEmail\t|\tUsername\t|\tStatus\n");
+    printf("-----------------------------------------------------------------------------------------------\n");
     for (int i = 0; i < userCount; i++) {
-    	printf("-------------------------------------------------------------------------------------------\n");
-        printf("%s\t|\t%s\t|\t%s\t|\t%s\n", users[i].name, users[i].phone, users[i].email, users[i].status);
+        printf("%s\t|\t%s\t|\t%s\t|\t%s\t|\t%s\n", users[i].name, users[i].phone, users[i].email, users[i].username, users[i].status);
     }
 }
 
-// Them nguoi dung moi
+// Ham them nguoi dung moi
 void addUser() {
-    // Cap phat lai bo nho cho mang users khi them nguoi dung moi
+    // Cap phat bo nho cho danh sach nguoi dung khi them nguoi dung moi
     users = realloc(users, (userCount + 1) * sizeof(struct User));
     if (users == NULL) {
         printf("Memory allocation failed!\n");
         return;
     }
-    // Yeu cau nguoi dung nhap thong tin
+    
+    // Cap phat bo nho cho cac truong thong tin cua nguoi dung moi
+    newUser.name = (char *) malloc(50 * sizeof(char));
+    newUser.phone = (char *) malloc(20 * sizeof(char));
+    newUser.email = (char *) malloc(50 * sizeof(char));
+    newUser.username = (char *) malloc(20 * sizeof(char));
+    newUser.password = (char *) malloc(20 * sizeof(char));
+    newUser.status = (char *) malloc(10 * sizeof(char));
+
+    if (!newUser.name || !newUser.phone || !newUser.email || !newUser.username || !newUser.password || !newUser.status) {
+        printf("Memory allocation failed for user fields.\n");
+        return;
+    }
+
+    // Nhap thong tin nguoi dung
     printf("Enter user name: ");
-    getchar();
-    fgets(newUser.name, sizeof(newUser.name), stdin);
-    newUser.name[strcspn(newUser.name, "\n")] = '\0';
+    getchar();  // De loai bo dau newline con lai trong bo dem
+    fgets(newUser.name, 50, stdin);
+    newUser.name[strcspn(newUser.name, "\n")] = '\0'; // Loai bo ky tu newline
+
     printf("Enter user phone number: ");
     scanf("%s", newUser.phone);
+
     printf("Enter user email: ");
     scanf("%s", newUser.email);
-    strcpy(newUser.password, newUser.phone);
+
+    printf("Enter user username: ");
+    scanf("%s", newUser.username);
+
+    // Kiem tra tinh hop le
+    if (!is_valid_string(newUser.name) || !is_valid_string(newUser.phone) || !is_valid_string(newUser.email) || !is_valid_string(newUser.username)) {
+        printf("User information cannot be empty.\n");
+        return;
+    }
+
+    // Kiem tra tinh duy nhat cua thong tin nguoi dung
+    if (!is_unique(newUser.name, newUser.phone, newUser.email, newUser.username)) {
+        printf("Duplicate information found. Please make sure ID, phone, email, and username are unique.\n");
+        return;
+    }
+
+    // Thiet lap mat khau va trang thai mac dinh
+    strcpy(newUser.password, newUser.phone);  // Mat khau giong so dien thoai
     strcpy(newUser.status, "open");
+
+    // Them nguoi dung vao danh sach
     users[userCount] = newUser;
     userCount++;
+
     printf("User added successfully!\n");
 }
 
-// Menu quan li Admin
+// Ham tim kiem nguoi dung theo ten
+void searchUserByName(char *name) {
+    int found = 0;
+    printf("\nSearch Results:\n");
+    printf("Name\t|\tPhone Number\t|\tEmail\t|\tUsername\t|\tStatus\n");
+    printf("-----------------------------------------------------------------------------------------------\n");
+
+    for (int i = 0; i < userCount; i++) {
+        if (strstr(users[i].name, name) != NULL) {
+            found = 1;
+            printf("%s\t|\t%s\t|\t%s\t|\t%s\t|\t%s\n", users[i].name, users[i].phone, users[i].email, users[i].username, users[i].status);
+        }
+    }
+
+    if (!found) {
+        printf("No users found with the given name.\n");
+    }
+}
+
+// Ham menu quan ly cua Admin
 void adminMenu() {
     int choiceAdmin;
     int exitLoop = 0;
@@ -84,10 +158,20 @@ void adminMenu() {
                 addUser();
                 break;
             case 3:
+                // Code for deleting a user can be added here
                 break;
             case 4:
+                // Code for editing user information can be added here
                 break;
             case 5:
+                {
+                    char searchName[50];
+                    printf("Enter the user name to search for: ");
+                    getchar();
+                    fgets(searchName, sizeof(searchName), stdin);
+                    searchName[strcspn(searchName, "\n")] = '\0';  // Remove newline character
+                    searchUserByName(searchName);
+                }
                 break;
             case 0:
                 exitLoop = 1;
