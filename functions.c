@@ -3,7 +3,7 @@
 #include <string.h>
 #include "functions.h"
 
-int userCount = 0;
+int userCount = 0;          // Bien dem so luong nguoi dung hien tai
 
 // Ham in ra menu chao
 void printHello() { 
@@ -15,6 +15,7 @@ void printHello() {
     printf("      [3]. Exit the Program \n");
     printf("      ==============================\n");
 }
+
 // Ham in ra menu quan ly nguoi dung cho Admin
 void managerMenu() {
     printf("\n   ===== User Management System =====\n");
@@ -29,11 +30,13 @@ void managerMenu() {
 
 // Ham kiem tra do dai hop le cua chuoi
 int is_valid_string(char *str) {
-    if(str != NULL && strlen(str) > 0){
-    	return;
-	}
+    if(str != NULL && strlen(str) > 0) {
+        return 1;
+    }
+    return 0;
 }
-// Ham kiem tra tinh duy nhat cua thong tin
+
+// Ham kiem tra tinh duy nhat cua thong tin nguoi dung
 int is_unique(char *id, char *phone, char *email, char *username) {
     for (int i = 0; i < userCount; i++) {
         if (strcmp(users[i].username, username) == 0 || strcmp(users[i].phone, phone) == 0 ||
@@ -43,6 +46,7 @@ int is_unique(char *id, char *phone, char *email, char *username) {
     }
     return 1;
 }
+
 // Ham hien thi danh sach nguoi dung
 void printUsers() {
     if (userCount == 0) {
@@ -56,50 +60,52 @@ void printUsers() {
         printf("%s\t|\t%s\t|\t%s\t|\t%s\t|\t%s\n", users[i].name, users[i].phone, users[i].email, users[i].username, users[i].status);
     }
 }
+
 // Ham them nguoi dung moi
 void addUser() {
-    // Cap phat bo nho cho danh sach nguoi dung khi them nguoi dung moi
+    // Cap phat lai bo nho cho mang users khi danh sach nguoi dung da het dung luong
     users = realloc(users, (userCount + 1) * sizeof(struct User));
-    if (users == NULL) {
-        printf("Memory allocation failed!\n");
-        return;
-    }
-    // Cap phat bo nho cho cac truong thong tin cua nguoi dung moi
-    newUser.name = (char *) malloc(50 * sizeof(char));
-    newUser.phone = (char *) malloc(20 * sizeof(char));
-    newUser.email = (char *) malloc(50 * sizeof(char));
-    newUser.username = (char *) malloc(20 * sizeof(char));
-    newUser.password = (char *) malloc(20 * sizeof(char));
-    newUser.status = (char *) malloc(10 * sizeof(char));
-    if (!newUser.name || !newUser.phone || !newUser.email || !newUser.username || !newUser.password || !newUser.status) {
-        printf("Memory allocation failed for user fields.\n");
-        return;
-    }
+
+    // Tao mot doi tuong nguoi dung moi
+    struct User newUser;
+
     // Nhap thong tin nguoi dung
     printf("Enter user name: ");
-    getchar();
-    fgets(newUser.name, 50, stdin);
+    getchar();  // Doc ki tu newline con sot lai
+    fgets(newUser.name, sizeof(newUser.name), stdin);
     newUser.name[strcspn(newUser.name, "\n")] = '\0'; 
+
     printf("Enter user phone number: ");
-    scanf("%s", newUser.phone);
+    fgets(newUser.phone, sizeof(newUser.phone), stdin);
+    newUser.phone[strcspn(newUser.phone, "\n")] = '\0';
+
     printf("Enter user email: ");
-    scanf("%s", newUser.email);
+    fgets(newUser.email, sizeof(newUser.email), stdin);
+    newUser.email[strcspn(newUser.email, "\n")] = '\0';
+
     printf("Enter login name: ");
-    scanf("%s", newUser.username);
+    fgets(newUser.username, sizeof(newUser.username), stdin);
+    newUser.username[strcspn(newUser.username, "\n")] = '\0';
 
     // Kiem tra tinh hop le
-    if (!is_valid_string(newUser.name) || !is_valid_string(newUser.phone) || !is_valid_string(newUser.email) || !is_valid_string(newUser.username)) {
+    if (!is_valid_string(newUser.name) || 
+        !is_valid_string(newUser.phone) || 
+        !is_valid_string(newUser.email) || 
+        !is_valid_string(newUser.username)) {
         printf("User information cannot be empty.\n");
         return;
     }
+
     // Kiem tra tinh duy nhat cua thong tin nguoi dung
     if (!is_unique(newUser.name, newUser.phone, newUser.email, newUser.username)) {
         printf("Duplicate information found. Please make sure ID, phone, email, and username are unique.\n");
         return;
     }
+
     // Thiet lap mat khau va trang thai mac dinh
     strcpy(newUser.password, newUser.phone);
     strcpy(newUser.status, "open");
+
     // Them nguoi dung vao danh sach
     users[userCount] = newUser;
     userCount++;
@@ -110,10 +116,10 @@ void addUser() {
 void searchUserByName(char *name) {
     int found = 0;
     if (strlen(name) < 2) {
-        printf("\nSearch Réults:\n");
-	    printf("Name\t|\tPhone Number\t|\tEmail\t|\tUsername\t|\tStatus\n");
-	    printf("-----------------------------------------------------------------------------------------------\n");
-	    printf("User not found. \n");
+        printf("\nSearch Results:\n");
+        printf("Name\t|\tPhone Number\t|\tEmail\t|\tUsername\t|\tStatus\n");
+        printf("-----------------------------------------------------------------------------------------------\n");
+        printf("User not found. \n");
         return;
     }
     printf("\nSearch Results:\n");
@@ -124,6 +130,7 @@ void searchUserByName(char *name) {
         searchNameLower[i] = tolower(name[i]);
     }
     searchNameLower[strlen(name)] = '\0';
+
     for (int i = 0; i < userCount; i++) {
         // Chuyen ten trong co so du lieu thanh chu thuong
         char userNameLower[50];
@@ -131,6 +138,7 @@ void searchUserByName(char *name) {
             userNameLower[j] = tolower(users[i].name[j]);
         }
         userNameLower[strlen(users[i].name)] = '\0';
+
         if (strcmp(userNameLower, searchNameLower) == 0) {
             found = 1;
             // Neu tim thay nguoi dung, in ra thong tin nguoi dung
@@ -138,11 +146,11 @@ void searchUserByName(char *name) {
         }
     }
 
-    // Neu khong tim thay nguoi dung, thong bao khong co ket qua
     if (!found) {
         printf("No users found with the given name.\n");
     }
 }
+
 // Ham menu quan ly cua Admin
 void adminMenu() {
     int choiceAdmin;

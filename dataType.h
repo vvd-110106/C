@@ -1,12 +1,12 @@
 #include <stdbool.h>
 
 struct User {
-    char *name;
-    char *phone;
-    char *email;
-    char *username;
-    char *password;
-    char *status;
+    char name[50];     // Tên ngý?i dùng
+    char phone[20];    // S? ði?n tho?i
+    char email[50];    // Email
+    char username[20]; // Tên ðãng nh?p
+    char password[20]; // M?t kh?u
+    char status[10];   // Tr?ng thái ngý?i dùng
 };
 
 // Cau trúc Date
@@ -15,4 +15,6 @@ struct Date {
 };
 struct User* users = NULL;
 struct User newUser;
+
+
 	
