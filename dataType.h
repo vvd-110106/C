@@ -9,7 +9,10 @@ struct User {
     char *status;
 };
 
-// C?u trúc Date
+// Cau trúc Date
 struct Date {
     int month, day, year;
 };
+struct User* users = NULL;
+struct User newUser;
+	
